@@ -61,5 +61,19 @@ public class MyWorld {
         shape.dispose();
         return body;
     }
+    
+    public static Body createPlatform(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(new Vector2(Config.PLATFORM_X, Config.PLATFORM_Y));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Config.PLATFORM_WIDTH/ 2, Config.PLATFORM_HEIGHT/ 2);
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, Config.PLATFORM_DENSITY);
+        body.resetMassData();
+        body.setUserData(new PlatformUserData(Config.PLATFORM_WIDTH, Config.PLATFORM_HEIGHT));
+        shape.dispose();
+        return body;
+    }
 
 }

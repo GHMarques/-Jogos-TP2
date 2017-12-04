@@ -30,6 +30,7 @@ public class GameStage extends Stage implements ContactListener {
     private World world;
     private Floor floor;
     private BaseMainChar runner;
+    private Platform platform;
 
     private final float TIME_STEP = 1 / 300f;
     private float accumulator = 0f;
@@ -55,6 +56,7 @@ public class GameStage extends Stage implements ContactListener {
         setUpFloor();
         setUpRunner();
         createEnemy();
+        setUpPlatform();
     }
 
     private void setUpFloor() {
@@ -65,6 +67,11 @@ public class GameStage extends Stage implements ContactListener {
     private void setUpRunner() {
         runner = new BaseMainChar(MyWorld.createRunner(world));
         addActor(runner);
+    }
+    
+    private void setUpPlatform() {
+        platform = new Platform(MyWorld.createPlatform(world));
+        addActor(platform);
     }
 
     private void setupCamera() {
@@ -133,11 +140,14 @@ public class GameStage extends Stage implements ContactListener {
         if ((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsEnemy(b)) ||
                 (CharUtils.bodyIsEnemy(a) && CharUtils.bodyIsRunner(b))) {
             runner.hit();
-        } else if ((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsGround(b)) ||
-                (CharUtils.bodyIsGround(a) && CharUtils.bodyIsRunner(b))) {
+        } else if (((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsGround(b)) ||
+                (CharUtils.bodyIsGround(a) && CharUtils.bodyIsRunner(b))) ||
+                (CharUtils.bodyIsRunner(a) && CharUtils.bodyIsPlatform(b)) ||
+                (CharUtils.bodyIsPlatform(a) && CharUtils.bodyIsRunner(b))
+                ) {
             runner.landed();
         }
-
+        
     }
 
 
@@ -178,5 +188,7 @@ public class GameStage extends Stage implements ContactListener {
         }
         return true;
     }
+
+    
 
 }

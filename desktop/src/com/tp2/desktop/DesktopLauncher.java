@@ -1,5 +1,6 @@
 package com.tp2.desktop;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.tp2.Tp2;
@@ -10,6 +11,7 @@ public class DesktopLauncher {
             LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
             config.width = Config.WORLD_WIDTH;
             config.height = Config.WORLD_HEIGHT;
+            
             new LwjglApplication(new Tp2(), config);
 	}
 }

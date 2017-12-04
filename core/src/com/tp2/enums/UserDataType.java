@@ -7,5 +7,6 @@ package com.tp2.enums;
 public enum UserDataType {
     FLOOR,
     CHAR,
-    ENEMY
+    ENEMY,
+    PLATFORM
 }
