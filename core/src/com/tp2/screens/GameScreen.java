@@ -10,6 +10,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.tp2.Tp2;
 import com.tp2.stages.*;
+import com.tp2.utils.Config;
 
 public class GameScreen extends Game implements Screen {
 
@@ -17,22 +18,23 @@ public class GameScreen extends Game implements Screen {
     final Tp2 game;
 
     public GameScreen(Tp2 game) {
-        
-        stage = new GameStage();
+        stage = new GameStage(game);
         this.game = game;
     }
 
     @Override
     public void render(float delta) {
         
+            
         super.render();
         
         //Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        
         //Update the stage
         stage.draw();
         stage.act(delta);
+        
     }
     
 

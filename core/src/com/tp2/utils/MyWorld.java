@@ -15,7 +15,7 @@ import com.tp2.utils.*;
 
 public class MyWorld {
 
-    public static World createWorld() {
+    public  static World createWorld() {
         return new World(Config.WORLD_GRAVITY, true);
     }
 
