@@ -20,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.tp2.utils.*;
 import com.tp2.characters.*;
 import com.badlogic.gdx.utils.Array;
+import com.tp2.Tp2;
+import com.tp2.screens.EndScreen;
 
 public class GameStage extends Stage implements ContactListener {
 
@@ -27,6 +29,9 @@ public class GameStage extends Stage implements ContactListener {
     private static final int VIEWPORT_WIDTH = 20;
     private static final int VIEWPORT_HEIGHT = 13;
 
+    private final int worldWidth = Config.WORLD_WIDTH;
+    private final int worldHeight = Config.WORLD_HEIGHT;
+    
     private World world;
     private Floor floor;
     private BaseMainChar runner;
@@ -42,8 +47,25 @@ public class GameStage extends Stage implements ContactListener {
     private Rectangle screenRightSide;
 
     private Vector3 touchPoint;
+    private final Tp2 game;
     
-    public GameStage() {
+    /*Score variables*/
+    private int count = 0;
+    private int score = 0;
+    private int timer = 1000;
+    private int multiplier = 1;
+    private int combo = 0;
+    private int combo4 = 4;
+    private int combo10 = 10;
+    private int combo25 = 25;
+    private int combo75 = 75;
+    private int combo100 = 100;
+    
+    private boolean whileCombo = false;
+    
+    public GameStage(Tp2 game) {
+        
+        this.game = game;
         setUpWorld();
         setupCamera();
         setupTouchControlAreas();
@@ -57,6 +79,7 @@ public class GameStage extends Stage implements ContactListener {
         setUpRunner();
         createEnemy();
         setUpPlatform();
+        
     }
 
     private void setUpFloor() {
@@ -73,7 +96,7 @@ public class GameStage extends Stage implements ContactListener {
         platform = new Platform(MyWorld.createPlatform(world));
         addActor(platform);
     }
-
+    
     private void setupCamera() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f);
@@ -90,8 +113,64 @@ public class GameStage extends Stage implements ContactListener {
 
     @Override
     public void act(float delta) {
+        
         super.act(delta);
+        
+        
+        /*Score control*/
+        
+        count++;
+        if(count%40==0){
+            score+=multiplier;
+        }
+        
+        /*
+        if(matou bicho){
+            whileCombo = true;
+        }
+        
+        if(whileCombo){
+            timer--;
+            if(matou bicho){
+        
+                    combo++;
+                    if(combo<4){
+                        timer = 1000;
+                        multiplier = 1;
+                    }
+                    else if(combo<10){
+                        timer = 900;
+                        multiplier = combo4;
+                    }
+                    else if(combo<25){
+                        timer = 800;
+                        multiplier = combo10;
+                    }
+                    else if(combo<75){
+                        timer = 700;
+                        multiplier = combo25;
+                    }
+                    else if(combo<100){
+                        timer = 500;
+                        multiplier = combo75;
+                    }
+                    else if(combo>=100){
+                        timer = 300;
+                        multiplier = combo100;
+                    }
+            }
 
+            if(timer<1){
+                whileCombo = false;
+                combo = 1;
+                timer = 1000;
+            }
+        }
+        
+        */
+        
+        /*end of score control*/
+        
         Array<Body> bodies = new Array<Body>(world.getBodyCount());
         world.getBodies(bodies);
 
@@ -108,8 +187,8 @@ public class GameStage extends Stage implements ContactListener {
         }
 
         //TODO: Implement interpolation
-
     }
+    
 
     private void update(Body body) {
         if (!CharUtils.bodyInBounds(body)) {
@@ -127,8 +206,15 @@ public class GameStage extends Stage implements ContactListener {
 
     @Override
     public void draw() {
+        
+        
+        game.batch.begin();
+            game.font.draw(game.batch, "Distância"+" : "+count, worldWidth*0.8f, worldHeight*0.95f);    
+            game.font.draw(game.batch, "Score"+" : "+score,worldWidth*0.8f , worldHeight*0.90f);
+        game.batch.end();
         super.draw();
         renderer.render(world, camera.combined);
+        
     }
     
     @Override
@@ -140,6 +226,7 @@ public class GameStage extends Stage implements ContactListener {
         if ((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsEnemy(b)) ||
                 (CharUtils.bodyIsEnemy(a) && CharUtils.bodyIsRunner(b))) {
             runner.hit();
+            game.setScreen(new EndScreen(game));
         } else if (((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsGround(b)) ||
                 (CharUtils.bodyIsGround(a) && CharUtils.bodyIsRunner(b))) ||
                 (CharUtils.bodyIsRunner(a) && CharUtils.bodyIsPlatform(b)) ||

@@ -47,7 +47,7 @@ public class MenuScreen extends Game implements Screen {
     private TextureRegion pointer; 
     
     
-    private Batch batch;
+    //private Batch batch;
     
     
     public MenuScreen(Tp2 game) {
@@ -60,11 +60,10 @@ public class MenuScreen extends Game implements Screen {
         
         pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
         pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.x/2);
-        batch = new SpriteBatch();
-        background = new TextureRegion(new Texture("background.png"));
-        iniciar = new TextureRegion(new Texture("iniciar.png"));
-        score = new TextureRegion(new Texture("score.png"));
-        pointer = new TextureRegion(new Texture("pointer.png"));
+        background = new TextureRegion(new Texture("images/background.png"));
+        iniciar = new TextureRegion(new Texture("images/iniciar.png"));
+        score = new TextureRegion(new Texture("images/score.png"));
+        pointer = new TextureRegion(new Texture("images/pointer.png"));
 
     }
     
@@ -103,13 +102,14 @@ public class MenuScreen extends Game implements Screen {
             
         super.render();
         
-        batch.begin();
-            batch.draw(background, 0, 0, worldWidth,worldHeight);
-            batch.draw(iniciar, iniciarBottom.x, iniciarBottom.y, iniciarSize.x,iniciarSize.y);
+        game.batch.begin();
+            game.batch.draw(background, 0, 0, worldWidth,worldHeight);
+            game.batch.draw(iniciar, iniciarBottom.x, iniciarBottom.y, iniciarSize.x,iniciarSize.y);
             if(teste)
-                batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
-            batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
-        batch.end();
+                game.batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
+            game.batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
+            //game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
+        game.batch.end();
     }
     
    @Override

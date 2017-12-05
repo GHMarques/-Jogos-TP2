@@ -1,6 +1,7 @@
 package com.tp2.utils;
 
 import com.badlogic.gdx.math.Vector2;
+import static java.lang.Math.random;
 
 /**
  *
@@ -13,7 +14,7 @@ public class Config {
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     
     //constantes do mundo
-    public static final float FLOOR_X = 0;
+    public static  final float FLOOR_X = 0;
     public static final float FLOOR_Y = 0;
     public static final float FLOOR_WIDTH = 25f;
     public static final float FLOOR_HEIGHT = 2f;

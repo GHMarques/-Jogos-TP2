@@ -1,8 +1,11 @@
 package com.tp2;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.tp2.screens.*;
 
 /**
@@ -12,9 +15,11 @@ import com.tp2.screens.*;
 public class Tp2 extends Game {
 	
     //Game game;
-    private SpriteBatch batch;
-    private BitmapFont font; 
-
+    public SpriteBatch batch;
+    public BitmapFont font; 
+    public FreeTypeFontGenerator generator;
+    public FreeTypeFontParameter parameter;
+    
     public Tp2() {
     }
    
@@ -22,9 +27,14 @@ public class Tp2 extends Game {
     @Override
     public void create () {
         batch = new SpriteBatch();
-        font = new BitmapFont();
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Bosk.ttf"));
+        parameter = new FreeTypeFontParameter();
+        parameter.size = 18;
+        parameter.color.set(com.badlogic.gdx.graphics.Color.GOLD);
+        font = generator.generateFont(parameter); 
+        generator.dispose();
+        
         setScreen(new MenuScreen(this));
-        //setScreen(new GameScreen());
         
     }
     
@@ -36,7 +46,6 @@ public class Tp2 extends Game {
     @Override
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
 	}
     
 }
