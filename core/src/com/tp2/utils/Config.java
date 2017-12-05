@@ -41,7 +41,7 @@ public class Config {
     public static final float RUNNING_SHORT_ENEMY_Y = 1.5f;
     public static final float RUNNING_LONG_ENEMY_Y = 2f;
     public static final float FLYING_ENEMY_Y = 3f;
-    public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-10f, 0);
+    public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-5f, 0);
     
     //constantes das plataformas
     public static final float PLATFORM_X = 30f;

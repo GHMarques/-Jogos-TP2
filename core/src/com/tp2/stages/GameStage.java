@@ -39,6 +39,7 @@ public class GameStage extends Stage implements ContactListener {
     private BaseMainChar runner;
     private Platform platform;
     private Bullet bullet;
+    private Enemy enemy;
 
     private final float TIME_STEP = 1 / 300f;
     private float accumulator = 0f;
@@ -68,6 +69,8 @@ public class GameStage extends Stage implements ContactListener {
     private boolean collisionEnemyBullet;
     private int countDestroy;
     private boolean whileCombo = false;
+    private float curveDifficulty;
+    private float difficultyValue;
     
     public GameStage(Tp2 game) {
         
@@ -87,6 +90,7 @@ public class GameStage extends Stage implements ContactListener {
         isShooting = false;
         collisionEnemyBullet = false;
         countDestroy = 0;
+        difficultyValue = 0;
         //setUpPlatform();
     }
 
@@ -132,40 +136,39 @@ public class GameStage extends Stage implements ContactListener {
             score+=multiplier;
         }
         
-        /*
-        if(matou bicho){
+        if(this.collisionEnemyBullet){
             whileCombo = true;
         }
         
         if(whileCombo){
             timer--;
-            if(matou bicho){
+            if(this.collisionEnemyBullet){
         
-                    combo++;
-                    if(combo<4){
-                        timer = 1000;
-                        multiplier = 1;
-                    }
-                    else if(combo<10){
-                        timer = 900;
-                        multiplier = combo4;
-                    }
-                    else if(combo<25){
-                        timer = 800;
-                        multiplier = combo10;
-                    }
-                    else if(combo<75){
-                        timer = 700;
-                        multiplier = combo25;
-                    }
-                    else if(combo<100){
-                        timer = 500;
-                        multiplier = combo75;
-                    }
-                    else if(combo>=100){
-                        timer = 300;
-                        multiplier = combo100;
-                    }
+                combo++;
+                if(combo<4){
+                    timer = 1000;
+                    multiplier = 1;
+                }
+                else if(combo<10){
+                    timer = 900;
+                    multiplier = combo4;
+                }
+                else if(combo<25){
+                    timer = 800;
+                    multiplier = combo10;
+                }
+                else if(combo<75){
+                    timer = 700;
+                    multiplier = combo25;
+                }
+                else if(combo<100){
+                    timer = 500;
+                    multiplier = combo75;
+                }
+                else if(combo>=100){
+                    timer = 300;
+                    multiplier = combo100;
+                }
             }
 
             if(timer<1){
@@ -175,18 +178,27 @@ public class GameStage extends Stage implements ContactListener {
             }
         }
         
-        */
         
         /*end of score control*/
         
         Array<Body> bodies = new Array<Body>(world.getBodyCount());
         world.getBodies(bodies);
+        if(enemy != null){
+            difficultyValue = this.findDifficulty(score);
+            curveDifficulty = getCurveValueBetween((float) difficultyValue, 5f, 20f);
+            curveDifficulty*=-1;
+            enemy.body.setLinearVelocity(curveDifficulty, 0);
+        }
+        
         if(runner.isHit()){
             for (Body body : bodies)
                 world.destroyBody(body);
             game.setScreen(new EndScreen(game));
         }
         else if(this.collisionEnemyBullet){
+            bullet.remove();
+            isShooting = false;
+            enemy.remove();
             for (Body body : bodies) {
                 if(CharUtils.bodyIsBullet(body)){
                     world.destroyBody(body);
@@ -220,18 +232,23 @@ public class GameStage extends Stage implements ContactListener {
     private void update(Body body) {
         if (!CharUtils.bodyInBounds(body)) {
             if (CharUtils.bodyIsEnemy(body) && !runner.isHit()) {
+                enemy.remove();
                 createEnemy();
+                whileCombo = false;
                 
             }
-            else if(CharUtils.bodyIsBullet(body))
+            else if(CharUtils.bodyIsBullet(body)){
                 isShooting = false;
+                bullet.remove();
+            }
+                
             world.destroyBody(body);
         }
         
     }
 
     private void createEnemy() {
-        Enemy enemy = new Enemy(MyWorld.createEnemy(world));
+        enemy = new Enemy(MyWorld.createEnemy(world));
         addActor(enemy);
     }
     
@@ -342,6 +359,40 @@ public class GameStage extends Stage implements ContactListener {
         return blnReturn;
     }
     
+    
+    public float getCurveValueBetween(float value, float min, float max) {
+        return getCurveValue(value) * (max - min) + min;
+    }
+    
+    //curve S
+    public float getCurveValue(float value) {
+        return (float) (1f / (1f + Math.pow(Math.E, -6 * (value - 0.5f))));
+    }
+    
+    public float findDifficulty(int score){
+        float returnDifficulty = (float) 0.1;
+        if(score <= 50)
+            returnDifficulty = (float) 0.1;
+        else if(score > 50 && score <= 100)
+            returnDifficulty = (float) 0.2;
+        else if(score > 100 && score <= 150)
+            returnDifficulty = (float) 0.3;
+        else if(score > 150 && score <= 200)
+            returnDifficulty = (float) 0.4;
+        else if(score > 200 && score <= 300)
+            returnDifficulty = (float) 0.5;
+        else if(score > 300 && score <= 400)
+            returnDifficulty = (float) 0.6;
+        else if(score > 400 && score <= 500)
+            returnDifficulty = (float) 0.7;
+        else if(score > 500 && score <= 750)
+            returnDifficulty = (float) 0.8;
+        else if(score > 750 && score <= 1000)
+            returnDifficulty = (float) 0.9;
+        else
+            returnDifficulty = (float) 1;
+        return returnDifficulty;
+    }
     
 
     
