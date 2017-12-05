@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.tp2.box2d.*;
 
 public abstract class BaseChar extends Actor {
-    protected Body body;
+    public Body body;
     protected UserData userData;
 
     public BaseChar(Body body) {

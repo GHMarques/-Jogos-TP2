@@ -46,6 +46,21 @@ public class MyWorld {
         return body;
     }
     
+    public static Body createRunnerBullet(World world, float x, float y) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(x, y));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Config.CHAR_BULLET_WIDTH/2, Config.CHAR_BULLET_HEIGHT);
+        Body body = world.createBody(bodyDef);
+        body.setGravityScale(Config.CHAR_GRAVITY_SCALE);
+        body.createFixture(shape, Config.CHAR_DENSITY);
+        body.resetMassData();
+        body.setUserData(new BulletUserData(Config.CHAR_WIDTH, Config.CHAR_HEIGHT));
+        shape.dispose();
+        return body;
+    }
+    
     public static Body createEnemy(World world) {
         EnemyType enemyType = Rand.getRandomEnemyType();
         BodyDef bodyDef = new BodyDef();

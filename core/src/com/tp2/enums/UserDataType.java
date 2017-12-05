@@ -8,5 +8,6 @@ public enum UserDataType {
     FLOOR,
     CHAR,
     ENEMY,
-    PLATFORM
+    PLATFORM,
+    BULLET
 }

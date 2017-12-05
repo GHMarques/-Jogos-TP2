@@ -20,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.tp2.utils.*;
 import com.tp2.characters.*;
 import com.badlogic.gdx.utils.Array;
+import com.tp2.box2d.BulletUserData;
+import java.util.ArrayList;
 
 public class GameStage extends Stage implements ContactListener {
 
@@ -31,6 +33,7 @@ public class GameStage extends Stage implements ContactListener {
     private Floor floor;
     private BaseMainChar runner;
     private Platform platform;
+    private Bullet bullet;
 
     private final float TIME_STEP = 1 / 300f;
     private float accumulator = 0f;
@@ -42,6 +45,10 @@ public class GameStage extends Stage implements ContactListener {
     private Rectangle screenRightSide;
 
     private Vector3 touchPoint;
+    
+    private boolean isShooting = false;
+    private boolean collisionEnemyBullet;
+    private int countDestroy;
     
     public GameStage() {
         setUpWorld();
@@ -56,7 +63,10 @@ public class GameStage extends Stage implements ContactListener {
         setUpFloor();
         setUpRunner();
         createEnemy();
-        setUpPlatform();
+        isShooting = false;
+        collisionEnemyBullet = false;
+        countDestroy = 0;
+        //setUpPlatform();
     }
 
     private void setUpFloor() {
@@ -94,12 +104,23 @@ public class GameStage extends Stage implements ContactListener {
 
         Array<Body> bodies = new Array<Body>(world.getBodyCount());
         world.getBodies(bodies);
-
-        for (Body body : bodies) {
-            update(body);
+        if(this.collisionEnemyBullet){
+            for (Body body : bodies) {
+                if(CharUtils.bodyIsBullet(body))
+                    world.destroyBody(body);
+                if(CharUtils.bodyIsEnemy(body))
+                    world.destroyBody(body);
+            }
+            this.collisionEnemyBullet = false;
+            createEnemy();
         }
+        else{
+            for (Body body : bodies) {
+                update(body);
+            }
+        }
+        
 
-        // Fixed timestep
         accumulator += delta;
 
         while (accumulator >= delta) {
@@ -107,22 +128,33 @@ public class GameStage extends Stage implements ContactListener {
             accumulator -= TIME_STEP;
         }
 
-        //TODO: Implement interpolation
-
     }
 
     private void update(Body body) {
         if (!CharUtils.bodyInBounds(body)) {
             if (CharUtils.bodyIsEnemy(body) && !runner.isHit()) {
                 createEnemy();
+                
             }
+            else if(CharUtils.bodyIsBullet(body))
+                isShooting = false;
             world.destroyBody(body);
         }
+        
     }
 
     private void createEnemy() {
         Enemy enemy = new Enemy(MyWorld.createEnemy(world));
         addActor(enemy);
+    }
+    
+    public void createBullet(){
+        bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.body.getPosition().x, runner.body.getPosition().y));
+        addActor(bullet);
+        isShooting = true;
+        //Bullet bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.getX(), runner.getY()));
+        //addActor(bullet);
+        //Bullet bullet1 = new Bullet(MyWorld.createRunnerBullet(world, 2, 2f));
     }
 
     @Override
@@ -136,11 +168,14 @@ public class GameStage extends Stage implements ContactListener {
 
         Body a = contact.getFixtureA().getBody();
         Body b = contact.getFixtureB().getBody();
-
-        if ((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsEnemy(b)) ||
-                (CharUtils.bodyIsEnemy(a) && CharUtils.bodyIsRunner(b))) {
+            
+        if (detectCollision(a, b))
             runner.hit();
-        } else if (((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsGround(b)) ||
+        else if (detectCollisionBulletEnemy(a, b)){
+            isShooting = false;
+            collisionEnemyBullet = true;
+        }
+        else if (((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsGround(b)) ||
                 (CharUtils.bodyIsGround(a) && CharUtils.bodyIsRunner(b))) ||
                 (CharUtils.bodyIsRunner(a) && CharUtils.bodyIsPlatform(b)) ||
                 (CharUtils.bodyIsPlatform(a) && CharUtils.bodyIsRunner(b))
@@ -170,12 +205,18 @@ public class GameStage extends Stage implements ContactListener {
     public boolean keyDown(int keycode)
     {
         switch (keycode){
+            //movement
             case Keys.UP:
-                    runner.jump();
-                    break;
+                runner.jump();
+                break;
             case Keys.DOWN:
-                    runner.dodge();
-                    break;
+                runner.dodge();
+                break;
+            //shoot
+            case Keys.SPACE:
+                if(!isShooting)
+                    createBullet();
+                break;
         }
         return true;
     }
@@ -188,6 +229,24 @@ public class GameStage extends Stage implements ContactListener {
         }
         return true;
     }
+    
+    public boolean detectCollision(Body a, Body b){
+        boolean blnReturn = false;
+        if ((CharUtils.bodyIsRunner(a) && CharUtils.bodyIsEnemy(b)) ||
+                (CharUtils.bodyIsEnemy(a) && CharUtils.bodyIsRunner(b)))
+            blnReturn = true;
+        return blnReturn;
+    }
+    
+    public boolean detectCollisionBulletEnemy(Body a, Body b){
+        boolean blnReturn = false;
+        if ((CharUtils.bodyIsBullet(a) && CharUtils.bodyIsEnemy(b)) ||
+                (CharUtils.bodyIsEnemy(a) && CharUtils.bodyIsBullet(b)))
+            blnReturn = true;
+        return blnReturn;
+    }
+    
+    
 
     
 

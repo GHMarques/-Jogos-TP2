@@ -30,6 +30,9 @@ public class Config {
     public static final float CHAR_DODGE_Y = 1.5f;
     public static final Vector2 CHAR_JUMPING_LINEAR_IMPULSE = new Vector2(0, 13f);
     public static final float CHAR_HIT_ANGULAR_IMPULSE = 10f;
+    public static final float CHAR_BULLET_WIDTH = 0.2f;
+    public static final float CHAR_BULLET_HEIGHT = 0.2f;
+    public static final Vector2 BULLET_LINEAR_VELOCITY = new Vector2(10f, 0);
     
     //constantes dos inimigos
     public static final float ENEMY_X = 25f;
