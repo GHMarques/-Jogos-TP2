@@ -27,6 +27,7 @@ import com.tp2.box2d.BulletUserData;
 import java.util.ArrayList;
 import com.tp2.Tp2;
 import com.tp2.screens.EndScreen;
+import com.tp2.screens.MenuScreen;
 import com.tp2.screens.TransitionGameOver;
 import static java.lang.Math.abs;
 
@@ -94,6 +95,11 @@ public class GameStage extends Stage implements ContactListener {
     private float difficultyValue;
     private float scroll=0;
     
+    private Vector2 shot;
+    private Vector2 pointerBottom;
+    private Vector2 pointerCenter;
+    private final Vector2 pointerSize = new Vector2(worldWidth*0.08f,worldHeight*0.08f);
+    
     public GameStage(Tp2 game) {
         
         this.game = game;
@@ -104,6 +110,8 @@ public class GameStage extends Stage implements ContactListener {
         background = new TextureRegion(new Texture("images/cenario.png"));
         bar = new TextureRegion(new Texture("images/bar.png"));
         bar2 = new TextureRegion(new Texture("images/bar2.png"));
+        pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
+        pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.x/2);
         
     }
 
@@ -148,11 +156,26 @@ public class GameStage extends Stage implements ContactListener {
                 getCamera().viewportHeight);
         Gdx.input.setInputProcessor(this);
     }
+    
+    public void handleInput(){
+        
+        if(Gdx.input.justTouched()){
+            if(!isShooting)
+                createBullet();
+        }
+    }
 
     @Override
     public void act(float delta) {
         
+        
+        
         super.act(delta);
+        
+        handleInput();
+        
+        pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
+        pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.y/2);
         
         
         /*Score control*/
@@ -294,7 +317,19 @@ public class GameStage extends Stage implements ContactListener {
     }
     
     public void createBullet(){
-        bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.body.getPosition().x, runner.body.getPosition().y));
+        Vector2 personagem = new Vector2(runner.body.getPosition().x,runner.body.getPosition().y);
+        Vector2 mouse = new Vector2(pointerCenter.x,pointerCenter.y);
+        
+        
+        float senShot,cosShot,hip,catOp,catAdj; 
+        //shot = new Vector2( pointerCenter.x-runner.body.getPosition().x, pointerCenter.y-runner.body.getPosition().y);
+        catOp = mouse.y-personagem.y;
+        catAdj = mouse.x-personagem.x;
+        hip = personagem.dst(mouse);
+        senShot = catOp/hip;
+        cosShot = catAdj/hip;
+        
+        bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.body.getPosition().x, runner.body.getPosition().y, catAdj/10 , catOp/10));
         addActor(bullet);
         isShooting = true;
         //Bullet bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.getX(), runner.getY()));
@@ -307,10 +342,9 @@ public class GameStage extends Stage implements ContactListener {
         
         
         game.batch.begin();
-            game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
-            /*  500 sob o timer é o maior valor possivel para o timer, 
-                fazendo com que a barra aumente e diminua conforme o seu valor
-            */
+            
+        //game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
+            
             game.batch.draw(bar,barBottom.x,barBottom.y, barSize.x, barSize.y);
             
             game.batch.draw(bar2,bar2Bottom.x,bar2Bottom.y, bar2Size.x*(timerCopy/maxActualTimer), bar2Size.y);

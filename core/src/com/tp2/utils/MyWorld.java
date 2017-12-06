@@ -46,7 +46,7 @@ public class MyWorld {
         return body;
     }
     
-    public static Body createRunnerBullet(World world, float x, float y) {
+    public static Body createRunnerBullet(World world, float x, float y,float vx, float vy) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(new Vector2(x, y));
@@ -56,7 +56,7 @@ public class MyWorld {
         body.setGravityScale(Config.CHAR_GRAVITY_SCALE);
         body.createFixture(shape, Config.CHAR_DENSITY);
         body.resetMassData();
-        body.setUserData(new BulletUserData(Config.CHAR_WIDTH, Config.CHAR_HEIGHT));
+        body.setUserData(new BulletUserData(Config.CHAR_WIDTH, Config.CHAR_HEIGHT,vx,vy));
         shape.dispose();
         return body;
     }

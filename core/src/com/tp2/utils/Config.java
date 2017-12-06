@@ -8,6 +8,9 @@ import static java.lang.Math.random;
  * @author GHMarques <gustavo.marques2011@gmail.com>
  */
 public class Config {
+    
+    int x;
+    
     public static final int WORLD_WIDTH = 800;
     public static final int WORLD_HEIGHT = 480;
     

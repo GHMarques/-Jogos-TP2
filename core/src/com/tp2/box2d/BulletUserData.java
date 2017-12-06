@@ -17,11 +17,14 @@ import com.tp2.utils.Config;
  * @author GHMarques <gustavo.marques2011@gmail.com>
  */
 public class BulletUserData extends UserData {
+    
     private Vector2 linearVelocity;
 
-    public BulletUserData (float width, float height) {
+    public BulletUserData (float width, float height, float vx, float vy) {
         super(width, height);
-        linearVelocity = Config.BULLET_LINEAR_VELOCITY;
+        
+        //linearVelocity = Config.BULLET_LINEAR_VELOCITY;
+        linearVelocity = new Vector2(vx,vy);
         userDataType = UserDataType.BULLET;
     }
 
