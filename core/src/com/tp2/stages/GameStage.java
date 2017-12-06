@@ -7,6 +7,8 @@ package com.tp2.stages;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -24,6 +26,8 @@ import com.tp2.box2d.BulletUserData;
 import java.util.ArrayList;
 import com.tp2.Tp2;
 import com.tp2.screens.EndScreen;
+import com.tp2.screens.TransitionGameOver;
+import static java.lang.Math.abs;
 
 public class GameStage extends Stage implements ContactListener {
 
@@ -53,10 +57,13 @@ public class GameStage extends Stage implements ContactListener {
     private Vector3 touchPoint;
     private final Tp2 game;
     
+    private TextureRegion background;
+    
+    
     /*Score variables*/
-    private int count = 0;
+    private int distance = 0;
     private int score = 0;
-    private int timer = 1000;
+    private int timer = 0;
     private int multiplier = 1;
     private int combo = 0;
     private int combo4 = 4;
@@ -71,6 +78,7 @@ public class GameStage extends Stage implements ContactListener {
     private boolean whileCombo = false;
     private float curveDifficulty;
     private float difficultyValue;
+    private float scroll=0;
     
     public GameStage(Tp2 game) {
         
@@ -79,6 +87,7 @@ public class GameStage extends Stage implements ContactListener {
         setupCamera();
         setupTouchControlAreas();
         renderer = new Box2DDebugRenderer();
+        background = new TextureRegion(new Texture("images/cenario.png"));
     }
 
     private void setUpWorld() {
@@ -130,10 +139,14 @@ public class GameStage extends Stage implements ContactListener {
         
         
         /*Score control*/
-        
-        count++;
-        if(count%40==0){
+        scroll+=2;
+        if(scroll+worldWidth>=background.getRegionWidth()){
+            scroll=0;
+        }
+        distance++;
+        if(distance%40==0){
             score+=multiplier;
+            
         }
         
         if(this.collisionEnemyBullet){
@@ -146,35 +159,35 @@ public class GameStage extends Stage implements ContactListener {
         
                 combo++;
                 if(combo<4){
-                    timer = 1000;
+                    timer = 500;
                     multiplier = 1;
                 }
                 else if(combo<10){
-                    timer = 900;
+                    timer = 400;
                     multiplier = combo4;
                 }
                 else if(combo<25){
-                    timer = 800;
+                    timer = 350;
                     multiplier = combo10;
                 }
                 else if(combo<75){
-                    timer = 700;
+                    timer = 250;
                     multiplier = combo25;
                 }
                 else if(combo<100){
-                    timer = 500;
+                    timer = 200;
                     multiplier = combo75;
                 }
                 else if(combo>=100){
-                    timer = 300;
+                    timer = 100;
                     multiplier = combo100;
                 }
             }
 
-            if(timer<1){
+            if(timer<0){
                 whileCombo = false;
                 combo = 1;
-                timer = 1000;
+                timer = 500;
             }
         }
         
@@ -193,7 +206,7 @@ public class GameStage extends Stage implements ContactListener {
         if(runner.isHit()){
             for (Body body : bodies)
                 world.destroyBody(body);
-            game.setScreen(new EndScreen(game));
+            game.setScreen(new TransitionGameOver(game,score,distance));
         }
         else if(this.collisionEnemyBullet){
             bullet.remove();
@@ -234,7 +247,7 @@ public class GameStage extends Stage implements ContactListener {
             if (CharUtils.bodyIsEnemy(body) && !runner.isHit()) {
                 enemy.remove();
                 createEnemy();
-                whileCombo = false;
+                //whileCombo = false;
                 
             }
             else if(CharUtils.bodyIsBullet(body)){
@@ -266,9 +279,18 @@ public class GameStage extends Stage implements ContactListener {
         
         
         game.batch.begin();
-            game.font.draw(game.batch, "Distância"+" : "+count, worldWidth*0.8f, worldHeight*0.95f);    
-            game.font.draw(game.batch, "Score"+" : "+score,worldWidth*0.8f , worldHeight*0.90f);
+            //game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
+
+            game.font.draw(game.batch, "Distância"+" : "+distance, worldWidth*0.82f, worldHeight*0.95f);    
+            game.font.draw(game.batch, "Score"+" : "+score,worldWidth*0.82f , worldHeight*0.90f);
+            game.font.draw(game.batch, "Timer"+" : "+timer,worldWidth*0.82f , worldHeight*0.85f);
+            game.font.draw(game.batch, "Combo"+" : "+multiplier,worldWidth*0.82f , worldHeight*0.8f);
+            game.font.draw(game.batch, "scroll: "+scroll+"mundo: "+worldWidth+"Background: "+background.getRegionWidth(),worldWidth*0.5f , worldHeight*0.70f);
+            
+            
+            
         game.batch.end();
+        
         super.draw();
         renderer.render(world, camera.combined);
         

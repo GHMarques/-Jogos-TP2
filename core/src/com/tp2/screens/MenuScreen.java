@@ -77,7 +77,6 @@ public class MenuScreen extends Game implements Screen {
         
         if(Gdx.input.justTouched()){
             if(collider(iniciarBottom,iniciarSize,pointerCenter)){
-                //this.create();
                 game.setScreen(new GameScreen(game));
                 teste = !teste;
             }
@@ -105,8 +104,7 @@ public class MenuScreen extends Game implements Screen {
         game.batch.begin();
             game.batch.draw(background, 0, 0, worldWidth,worldHeight);
             game.batch.draw(iniciar, iniciarBottom.x, iniciarBottom.y, iniciarSize.x,iniciarSize.y);
-            if(teste)
-                game.batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
+            game.batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
             game.batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
             //game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
         game.batch.end();
