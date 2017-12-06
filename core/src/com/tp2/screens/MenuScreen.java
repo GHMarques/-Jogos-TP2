@@ -26,8 +26,6 @@ public class MenuScreen extends Game implements Screen {
     
     final Tp2 game;
     
-    boolean teste = false;
-    
     private final int worldWidth = Config.WORLD_WIDTH;
     private final int worldHeight = Config.WORLD_HEIGHT;
     
@@ -37,6 +35,9 @@ public class MenuScreen extends Game implements Screen {
     private final Vector2 scoreBottom = new Vector2(worldWidth*0.1f,worldHeight*0.65f);
     private final Vector2 scoreSize = new Vector2(worldWidth*0.3f,worldHeight*0.06f); 
     
+    private final Vector2 sairBottom = new Vector2(worldWidth*0.1f,worldHeight*0.50f);
+    private final Vector2 sairSize = new Vector2(worldWidth*0.3f,worldHeight*0.06f); 
+    
     private final Vector2 pointerSize = new Vector2(worldWidth*0.08f,worldHeight*0.08f); 
     private Vector2 pointerBottom;
     private Vector2 pointerCenter;
@@ -45,10 +46,7 @@ public class MenuScreen extends Game implements Screen {
     private TextureRegion iniciar; 
     private TextureRegion score; 
     private TextureRegion pointer; 
-    
-    
-    //private Batch batch;
-    
+    private TextureRegion sair; 
     
     public MenuScreen(Tp2 game) {
         this.game = game;
@@ -64,6 +62,8 @@ public class MenuScreen extends Game implements Screen {
         iniciar = new TextureRegion(new Texture("images/iniciar.png"));
         score = new TextureRegion(new Texture("images/score.png"));
         pointer = new TextureRegion(new Texture("images/pointer.png"));
+        sair = new TextureRegion(new Texture("images/sair.png"));
+        
 
     }
     
@@ -78,7 +78,12 @@ public class MenuScreen extends Game implements Screen {
         if(Gdx.input.justTouched()){
             if(collider(iniciarBottom,iniciarSize,pointerCenter)){
                 game.setScreen(new GameScreen(game));
-                teste = !teste;
+            }
+            else if(collider(scoreBottom,scoreSize,pointerCenter)){
+                game.setScreen(new HighScoreScreen(game));
+            }
+            else if(collider(sairBottom,sairSize,pointerCenter)){
+                System.exit(1);
             }
         }
         
@@ -105,7 +110,10 @@ public class MenuScreen extends Game implements Screen {
             game.batch.draw(background, 0, 0, worldWidth,worldHeight);
             game.batch.draw(iniciar, iniciarBottom.x, iniciarBottom.y, iniciarSize.x,iniciarSize.y);
             game.batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
+             game.batch.draw(sair,sairBottom.x,sairBottom.y,sairSize.x,sairSize.y);
             game.batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
+           
+            
             //game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
         game.batch.end();
     }

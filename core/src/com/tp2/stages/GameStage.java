@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -58,12 +59,25 @@ public class GameStage extends Stage implements ContactListener {
     private final Tp2 game;
     
     private TextureRegion background;
+    private TextureRegion bar;
+    private TextureRegion bar2;
     
+    
+    private final Vector2 barBottom = new Vector2(worldWidth*0.86f,worldHeight*0.8055f);
+    private final Vector2 barSize = new Vector2(worldWidth*0.13f,worldHeight*0.05f);
+    
+    
+    private final Vector2 bar2Bottom = new Vector2(worldWidth*0.86f,worldHeight*0.8055f);
+    private final Vector2 bar2Size = new Vector2(worldWidth*0.13f,worldHeight*0.05f);
     
     /*Score variables*/
     private int distance = 0;
     private int score = 0;
     private int timer = 0;
+    private int maxActualTimer = 400;
+    
+    private float timerCopy = 0;
+    
     private int multiplier = 1;
     private int combo = 0;
     private int combo4 = 4;
@@ -88,6 +102,9 @@ public class GameStage extends Stage implements ContactListener {
         setupTouchControlAreas();
         renderer = new Box2DDebugRenderer();
         background = new TextureRegion(new Texture("images/cenario.png"));
+        bar = new TextureRegion(new Texture("images/bar.png"));
+        bar2 = new TextureRegion(new Texture("images/bar2.png"));
+        
     }
 
     private void setUpWorld() {
@@ -149,45 +166,56 @@ public class GameStage extends Stage implements ContactListener {
             
         }
         
-        if(this.collisionEnemyBullet){
+        if(this.collisionEnemyBullet && !whileCombo){
+            timer = maxActualTimer;
             whileCombo = true;
         }
         
         if(whileCombo){
+            timerCopy = timer;
             timer--;
             if(this.collisionEnemyBullet){
         
                 combo++;
                 if(combo<4){
-                    timer = 500;
+                    timer = 400;
                     multiplier = 1;
+                    maxActualTimer = 400;
                 }
                 else if(combo<10){
-                    timer = 400;
+                    timer = 300;
                     multiplier = combo4;
+                    maxActualTimer = 300;
                 }
                 else if(combo<25){
-                    timer = 350;
+                    timer = 250;
                     multiplier = combo10;
+                    maxActualTimer = 250;
                 }
                 else if(combo<75){
-                    timer = 250;
+                    timer = 200;
                     multiplier = combo25;
+                    maxActualTimer = 200;
                 }
                 else if(combo<100){
-                    timer = 200;
+                    timer = 150;
                     multiplier = combo75;
+                    maxActualTimer = 150;
                 }
                 else if(combo>=100){
                     timer = 100;
                     multiplier = combo100;
+                    maxActualTimer = 100;
                 }
             }
 
             if(timer<0){
                 whileCombo = false;
-                combo = 1;
-                timer = 500;
+                multiplier = 1;
+                timer = 400;
+                timerCopy = 0;
+                maxActualTimer = 400;
+                combo = 0;
             }
         }
         
@@ -279,13 +307,20 @@ public class GameStage extends Stage implements ContactListener {
         
         
         game.batch.begin();
-            //game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
-
-            game.font.draw(game.batch, "Distância"+" : "+distance, worldWidth*0.82f, worldHeight*0.95f);    
-            game.font.draw(game.batch, "Score"+" : "+score,worldWidth*0.82f , worldHeight*0.90f);
-            game.font.draw(game.batch, "Timer"+" : "+timer,worldWidth*0.82f , worldHeight*0.85f);
-            game.font.draw(game.batch, "Combo"+" : "+multiplier,worldWidth*0.82f , worldHeight*0.8f);
-            game.font.draw(game.batch, "scroll: "+scroll+"mundo: "+worldWidth+"Background: "+background.getRegionWidth(),worldWidth*0.5f , worldHeight*0.70f);
+            game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
+            /*  500 sob o timer é o maior valor possivel para o timer, 
+                fazendo com que a barra aumente e diminua conforme o seu valor
+            */
+            game.batch.draw(bar,barBottom.x,barBottom.y, barSize.x, barSize.y);
+            
+            game.batch.draw(bar2,bar2Bottom.x,bar2Bottom.y, bar2Size.x*(timerCopy/maxActualTimer), bar2Size.y);
+            
+            game.font.draw(game.batch, "Distância: "+distance, worldWidth*0.77f, worldHeight*0.95f);    
+            game.font.draw(game.batch, "Score: "+score,worldWidth*0.77f , worldHeight*0.90f);
+            game.font.draw(game.batch, "Timer: ",worldWidth*0.77f , worldHeight*0.85f);
+            game.font.draw(game.batch, "Combo: "+multiplier,worldWidth*0.77f , worldHeight*0.8f);
+            
+            //game.font.draw(game.batch, "scroll: "+scroll+"mundo: "+worldWidth+"Background: "+background.getRegionWidth(),worldWidth*0.5f , worldHeight*0.70f);
             
             
             

@@ -24,7 +24,6 @@ public class EndScreen extends Game implements Screen {
     
     private TextureRegion backgroundEnd; 
     private TextureRegion reiniciar; 
-    private TextureRegion score; 
     private TextureRegion sair; 
     private TextureRegion pointer; 
     
@@ -34,10 +33,7 @@ public class EndScreen extends Game implements Screen {
     private final Vector2 reiniciarBottom = new Vector2(worldWidth*0.1f,worldHeight*0.8f);
     private final Vector2 reiniciarSize = new Vector2(worldWidth*0.3f,worldHeight*0.06f); 
     
-    private final Vector2 scoreBottom = new Vector2(worldWidth*0.1f,worldHeight*0.65f);
-    private final Vector2 scoreSize = new Vector2(worldWidth*0.3f,worldHeight*0.06f); 
-    
-    private final Vector2 sairBottom = new Vector2(worldWidth*0.1f,worldHeight*0.5f);
+    private final Vector2 sairBottom = new Vector2(worldWidth*0.1f,worldHeight*0.65f);
     private final Vector2 sairSize = new Vector2(worldWidth*0.3f,worldHeight*0.06f); 
     
     private final Vector2 pointerSize = new Vector2(worldWidth*0.08f,worldHeight*0.08f); 
@@ -54,9 +50,7 @@ public class EndScreen extends Game implements Screen {
         pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
         pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.x/2);
         backgroundEnd = new TextureRegion(new Texture("images/background2.png"));
-        reiniciar = new TextureRegion(new Texture("images/reiniciar.png"));
-        
-        score = new TextureRegion(new Texture("images/score2.png"));
+        reiniciar = new TextureRegion(new Texture("images/menu.png"));
         sair = new TextureRegion(new Texture("images/sair.png"));
         pointer = new TextureRegion(new Texture("images/pointer.png"));
 
@@ -72,7 +66,7 @@ public class EndScreen extends Game implements Screen {
         if(Gdx.input.justTouched()){
             if(collider(reiniciarBottom,reiniciarSize,pointerCenter)){
                 //this.create();
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new MenuScreen(game));
             }
             else if(collider(sairBottom,sairSize,pointerCenter)){
                 System.exit(1);
@@ -100,13 +94,11 @@ public class EndScreen extends Game implements Screen {
         game.batch.begin();
             game.batch.draw(backgroundEnd, 0, 0, worldWidth,worldHeight);
             game.batch.draw(reiniciar, reiniciarBottom.x, reiniciarBottom.y, reiniciarSize.x,reiniciarSize.y);
-            game.batch.draw(score, scoreBottom.x, scoreBottom.y, scoreSize.x,scoreSize.y);
+            
             game.batch.draw(sair, sairBottom.x, sairBottom.y, sairSize.x, sairSize.y);
             game.batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
             //game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
         game.batch.end();
-        
-        
     }
 
     @Override

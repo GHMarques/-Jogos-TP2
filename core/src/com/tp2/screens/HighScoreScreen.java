@@ -6,6 +6,8 @@
 package com.tp2.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.Screen;
@@ -18,15 +20,13 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.math.Vector2;
 import com.tp2.Tp2;
 import com.tp2.utils.Config;
-
 /**
  *
  * @author Rogenes
  */
-public class TransitionGameOver extends Game implements Screen{
+public class HighScoreScreen extends Game implements Screen{
 
     Tp2 game;
-    String nome;
     
     private final int worldWidth = Config.WORLD_WIDTH;
     private final int worldHeight = Config.WORLD_HEIGHT;
@@ -36,16 +36,20 @@ public class TransitionGameOver extends Game implements Screen{
     
     private TextureRegion pointer;
     private TextureRegion background;
+    private TextureRegion voltar;
+    
     
     private final Vector2 pointerSize = new Vector2(worldWidth*0.08f,worldHeight*0.08f); 
     private Vector2 pointerBottom;
     private Vector2 pointerCenter;
     
+    private Vector2 voltarBottom;
+    private Vector2 voltarSize;
+    
+    
     private FreeTypeFontGenerator generator2;
     private FreeTypeFontParameter parameter2;
     private BitmapFont font2;
-    
-    MyTextInputListener listener;
     
     private FileHandle file;
     private boolean fileExists;
@@ -55,13 +59,30 @@ public class TransitionGameOver extends Game implements Screen{
     private String scoreFromFile = "";
     private String distFromFile = "";
     
-
-    public TransitionGameOver(Tp2 game, int score, int distance) {
+    
+    
+    public HighScoreScreen(Tp2 game) {
         this.game = game;
-        this.score = score;
-        this.distance = distance;
         init();
     }
+    
+    public boolean collider(Vector2 bottom, Vector2 size, Vector2 click){
+        return (click.x>bottom.x && click.x<(bottom.x+size.x)) &&
+                (click.y>bottom.y && click.y<(bottom.y+size.y));
+    }
+    
+    public void handleInput(){
+        if(Gdx.input.justTouched()){
+            if(collider(voltarBottom,voltarSize,pointerCenter)){
+                game.setScreen(new MenuScreen(game));
+            }
+        }
+    }
+    
+      public void update(float delta){
+          pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
+          pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.y/2);
+      }
     
     public void init(){
         int i,countSpace = 0;
@@ -78,21 +99,26 @@ public class TransitionGameOver extends Game implements Screen{
         fileContent = file.readString();
         fileLenght = file.length();
         
-        nome = "";
         generator2 = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Bosk.ttf"));
         parameter2 = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter2.size = 30;
-        parameter2.color.set(com.badlogic.gdx.graphics.Color.GOLD);
+        parameter2.size = 40;
+        parameter2.color.set(com.badlogic.gdx.graphics.Color.GRAY);
         parameter2.borderColor.set(com.badlogic.gdx.graphics.Color.BLACK);
         parameter2.borderWidth = 3;
         font2 = generator2.generateFont(parameter2); 
         generator2.dispose();
         
-        alreadyWrote = false;
         pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
         pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.x/2);
+        
+        voltarBottom = new Vector2(worldWidth*0.37f,worldHeight*0.12f);
+        voltarSize = new Vector2(worldWidth*0.26f,worldHeight*0.05f);
+        
+        
         pointer = new TextureRegion(new Texture("images/pointer.png"));
-        background = new TextureRegion(new Texture("images/background3.jpg"));
+        background = new TextureRegion(new Texture("images/background4.png"));
+        voltar = new TextureRegion(new Texture("images/voltar.png"));
+        
         
         if(fileLenght>0){
             for(i=0;i<fileLenght;i++){
@@ -125,42 +151,6 @@ public class TransitionGameOver extends Game implements Screen{
         }
     }
     
-    private void writeScore() {
-        fileContent = file.readString();
-        fileLenght = file.length();
-        
-        if(fileLenght>0){
-            if(score >= Integer.parseInt(scoreFromFile)){
-                file.writeString(nome, false);
-                //fileContent = file.readString();
-            }
-        }
-        else{
-            file.writeString(nome, false);
-            //fileContent = file.readString();
-        }
-    }
-    
-    public void handleInput(){
-        if(Gdx.input.justTouched()){
-            if(!alreadyWrote){
-                //chama box de input de nome
-                //se escreveu, alreadyWrote vira false, la na MyTextInputListener
-                listener = new MyTextInputListener();
-                Gdx.input.getTextInput(listener, "Escreva seu nome", "", "seu nome");
-            }
-            else if(alreadyWrote){
-                nome = nome+"\n"+distance+"\n"+score;
-                writeScore();
-                game.setScreen(new EndScreen(game));
-            }
-        }
-    }
-    
-      public void update(float delta){
-          pointerBottom = new Vector2(Gdx.input.getX()-pointerSize.x/2,worldHeight-Gdx.input.getY()-pointerSize.y/2);
-          pointerCenter = new Vector2(pointerBottom.x+pointerSize.x/2,pointerBottom.y+pointerSize.y/2);
-      }
     
     
     @Override
@@ -173,7 +163,6 @@ public class TransitionGameOver extends Game implements Screen{
 
     @Override
     public void render(float delta) {
-        
         handleInput();
         update(delta);
         super.render();
@@ -181,18 +170,19 @@ public class TransitionGameOver extends Game implements Screen{
         game.batch.begin();
             
             game.batch.draw(background,0,0,worldWidth,worldHeight);
+            game.batch.draw(voltar,voltarBottom.x,voltarBottom.y,voltarSize.x,voltarSize.y);
+            
+            
+            
+            font2.draw(game.batch,"HighScore!",worldWidth*0.4f, worldHeight*0.95f); 
+            if(fileLenght>0){
+                    font2.draw(game.batch,"Nome: "+nameFromFile,worldWidth*0.37f, worldHeight*0.8f); 
+                    font2.draw(game.batch,"Score: "+scoreFromFile,worldWidth*0.37f, worldHeight*0.7f); 
+                    font2.draw(game.batch,"Distância: "+distFromFile,worldWidth*0.37f, worldHeight*0.6f); 
+                    
+            }
             game.batch.draw(pointer,pointerBottom.x,pointerBottom.y,pointerSize.x,pointerSize.y);
-            font2.draw(game.batch, "Seu Score: "+score,worldWidth*0.37f , worldHeight*0.87f);
-            font2.draw(game.batch, "Sua Distância: "+distance, worldWidth*0.37f, worldHeight*0.79f);    
-            font2.draw(game.batch, "Seu nome: "+nome, worldWidth*0.37f, worldHeight*0.95f);
-            if(alreadyWrote)
-                font2.draw(game.batch, "Clique para continuar...", worldWidth*0.37f, worldHeight*0.65f);
             
-            
-            /*  if(fileLenght>0){
-                    font2.draw(game.batch,"nome: "+nameFromFile+"Dist: "+distFromFile+"Score: "+scoreFromFile, worldWidth*0.35f, worldHeight*0.55f); 
-                }
-            */
                    
         game.batch.end();
     }
@@ -200,24 +190,5 @@ public class TransitionGameOver extends Game implements Screen{
     @Override
     public void hide() {
     }
-
     
-    
-    public class MyTextInputListener implements TextInputListener {
-
-        public MyTextInputListener() {
-        }
-        
-        @Override
-        public void input (String text) {
-            nome = text;
-            if(!"".equals(text) && text!=null){
-                alreadyWrote = true;
-            }
-        }
-
-        @Override
-        public void canceled () {
-   }
-    }
 }
