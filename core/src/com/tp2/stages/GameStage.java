@@ -160,8 +160,6 @@ public class GameStage extends Stage implements ContactListener {
     public void handleInput(){
         
         if(Gdx.input.justTouched()){
-            if(!isShooting)
-                createBullet();
         }
     }
 
@@ -317,19 +315,8 @@ public class GameStage extends Stage implements ContactListener {
     }
     
     public void createBullet(){
-        Vector2 personagem = new Vector2(runner.body.getPosition().x,runner.body.getPosition().y);
-        Vector2 mouse = new Vector2(pointerCenter.x,pointerCenter.y);
         
-        
-        float senShot,cosShot,hip,catOp,catAdj; 
-        //shot = new Vector2( pointerCenter.x-runner.body.getPosition().x, pointerCenter.y-runner.body.getPosition().y);
-        catOp = mouse.y-personagem.y;
-        catAdj = mouse.x-personagem.x;
-        hip = personagem.dst(mouse);
-        senShot = catOp/hip;
-        cosShot = catAdj/hip;
-        
-        bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.body.getPosition().x, runner.body.getPosition().y, catAdj/10 , catOp/10));
+        bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.body.getPosition().x, runner.body.getPosition().y));
         addActor(bullet);
         isShooting = true;
         //Bullet bullet = new Bullet(MyWorld.createRunnerBullet(world, runner.getX(), runner.getY()));
@@ -343,7 +330,7 @@ public class GameStage extends Stage implements ContactListener {
         
         game.batch.begin();
             
-        //game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
+            game.batch.draw(background,-scroll,-50, worldWidth*5, worldHeight+51);    
             
             game.batch.draw(bar,barBottom.x,barBottom.y, barSize.x, barSize.y);
             

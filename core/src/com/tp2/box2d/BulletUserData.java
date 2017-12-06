@@ -20,11 +20,10 @@ public class BulletUserData extends UserData {
     
     private Vector2 linearVelocity;
 
-    public BulletUserData (float width, float height, float vx, float vy) {
+    public BulletUserData (float width, float height) {
         super(width, height);
         
-        //linearVelocity = Config.BULLET_LINEAR_VELOCITY;
-        linearVelocity = new Vector2(vx,vy);
+        linearVelocity = Config.BULLET_LINEAR_VELOCITY;
         userDataType = UserDataType.BULLET;
     }
 
